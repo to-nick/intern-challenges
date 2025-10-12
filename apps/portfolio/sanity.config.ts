@@ -8,9 +8,15 @@ export default defineConfig({
   title: "Portfolio Blog",
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  basePath: "/studio", // Studio will be at /studio route
+  basePath: "/studio",
   plugins: [structureTool(), visionTool()],
   schema: {
     types: schemaTypes,
+  },
+  cors: {
+    allowOrigins: [
+      "http://localhost:3000",
+      "https://*.vercel.app", 
+    ],
   },
 });
