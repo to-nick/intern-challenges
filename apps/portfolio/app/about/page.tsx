@@ -5,7 +5,7 @@ export default function About() {
           <h1 className="text-4xl font-bold mb-8 ">About Me</h1>
           <div className="prose prose-lg max-w-3xl">
             <p>
-              I'm learning modern web development technologies including Next.js,
+              I&apos;m learning modern web development technologies including Next.js,
               Sanity.io, Tailwind CSS, and more!
             </p>
           </div>

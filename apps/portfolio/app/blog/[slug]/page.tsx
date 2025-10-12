@@ -1,12 +1,12 @@
 import { client } from "@/lib/sanity";
-import { PortableText } from "@portabletext/react";
+import { PortableText, PortableTextBlock } from "@portabletext/react";
 import { notFound } from "next/navigation";
 
 interface Post {
   _id: string;
   title: string;
   slug: { current: string };
-  body: any;
+  body: PortableTextBlock[];
   publishedAt: string;
   author?: string;
 }
