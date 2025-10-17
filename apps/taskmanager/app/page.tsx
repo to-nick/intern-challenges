@@ -1,103 +1,134 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Task } from "@prisma/client";
+import TaskCard from "./components/TaskCard";
+import TaskForm from "./components/TaskForm";
+import { POST } from "./api/tasks/route";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<Task["status"] | "ALL">("ALL");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try{
+      const response = await fetch("api/tasks");
+      const data = await response.json()
+      setTasks(data);
+    } catch (error){
+      console.error("Failed to fetch tasks:", error);
+    } finally {
+      setLoading(false)
+    }
+  };
+
+  const createTask = async ( taskData: {
+    title: string;
+    description: string;
+    priority: Task["priority"];
+  }) => {
+    try{
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(taskData),
+      })
+      const newTask = await response.json();
+      setTasks([newTask, ...tasks])
+    } catch (error) {
+      console.error("Failed to create task:", error);
+    }
+  }
+
+  const updateTask = async (id: string, status: Task["status"]) => {
+    try{
+      const response = await fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+      const updatedTask = await response.json();
+      setTasks(tasks.map((task) => (task.id === id ? updatedTask : task)));
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  }
+
+  const deleteTask = async (id: string) => {
+    try{
+      await fetch(`/api/tasks/${id}`, { method: "DELETE" });
+      setTasks(tasks.filter((task) => task.id !== id));
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  }
+
+  const filteredTasks =
+    filter === "ALL" ? tasks : tasks.filter((t) => t.status === filter);
+
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="container mx-auto px-4 py-8">
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          Task Manager
+        </h1>
+        <p className="text-gray-600">
+          Manage your tasks efficiently with status tracking
+        </p>
+      </header>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-1">
+          <TaskForm onSubmit={createTask} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="md:col-span-2">
+          <div className="mb-4 flex gap-2">
+            {(["ALL", "TODO", "IN_PROGRESS", "DONE"] as const).map(
+              (status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status)}
+                  className={`px-4 py-2 rounded transition ${
+                    filter === status
+                      ? "bg-indigo-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {status.replace("_", " ")}
+                </button>
+              )
+            )}
+          </div>
+
+          {loading ? (
+            <p className="text-center py-8">Loading tasks...</p>
+          ) : filteredTasks.length === 0 ? (
+            <p className="text-center py-8 text-gray-500">
+              No tasks found. Create one to get started!
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {filteredTasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onUpdate={updateTask}
+                  onDelete={deleteTask}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
-  );
+  </main>
+  )
 }
