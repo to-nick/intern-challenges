@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(
-    request: NextRequest,
-    { params }: { params: { id: string } }
-  ) {
+interface Params {
+    params: { id: string };
+  }
+
+export async function GET(request: NextRequest, context: Params) {
+    const { id } = context.params
     try {
       const task = await prisma.task.findUnique({
-        where: { id: params.id },
+        where: { id },
       });
       if (!task) {
         return NextResponse.json({ error: "Task not found" }, { status: 404 });
@@ -21,14 +23,12 @@ export async function GET(
     }
   }
 
-export async function PATCH(
-    request: NextRequest,
-    { params }: { params: { id: string }}
-) {
+export async function PATCH(request: NextRequest, context: Params) {
+    const { id } = context.params
     try{
         const body = await request.json()
         const task = await prisma.task.update({
-            where: { id: params.id },
+            where: { id },
             data: body,
         });
         return NextResponse.json(task);
@@ -40,12 +40,11 @@ export async function PATCH(
     }
 }
 
-export async function DELETE( request: NextRequest, 
-    { params }: { params: { id: string } }
-) {
+export async function DELETE( request: NextRequest, context: Params) {
+    const { id } = context.params
     try{
         await prisma.task.delete({
-            where: { id: params.id },
+            where: { id },
         });
         return NextResponse.json({ success: true });
     } catch (error){
