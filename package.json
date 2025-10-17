@@ -7,7 +7,8 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "dev:portfolio": "turbo run dev --filter=portfolio",
-    "dev:taskmanager": "turbo run dev --filter=taskmanager"
+    "dev:taskmanager": "turbo run dev --filter=taskmanager",
+    "build:taskmanager": "pnpm -w install && pnpm -C apps/taskmanager build"
   },
   "devDependencies": {
     "turbo": "^2.0.0"
