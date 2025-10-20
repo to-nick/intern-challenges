@@ -8,6 +8,7 @@ interface TaskFormProps {
       title: string;
       description: string;
       priority: Priority;
+      dueDate: string | null;
     }) => void;
   }
 
@@ -15,15 +16,17 @@ interface TaskFormProps {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [priority, setPriority] = useState<Priority>("MEDIUM");
+    const [dueDate, setDueDate] = useState<string | null>('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim()) return;
 
-        onSubmit({ title, description, priority });
+        onSubmit({ title, description, priority, dueDate });
         setTitle("");
         setDescription("");
         setPriority("MEDIUM");
+        setDueDate('');
     };
 
     return (
@@ -75,6 +78,19 @@ interface TaskFormProps {
                 <option value="MEDIUM">Medium</option>
                 <option value="HIGH">High</option>
               </select>
+            </div>
+            <div>
+              <label htmlFor="dueDate" 
+                    className="block text-sm text-black font-medium mb-1">Due Date
+              </label>
+              <input type="datetime-local" 
+                      id="dueDate"
+                      name="dueDate"
+                      value={dueDate || ''}
+                      className="w-full border border-gray-300 text-gray-500 rounded px-3 py-2"
+                      onChange={(e) => setDueDate(e.target.value)}>
+                      
+              </input>
             </div>
             <button
               type="submit"

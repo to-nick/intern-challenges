@@ -12,15 +12,42 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  passwordHash  String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tasks    Task[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+
+  @@map("sessions")
+}
 
 model Task {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String?
-  status      Status   @default(TODO)
-  priority    Priority @default(MEDIUM)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      Status    @default(TODO)
+  priority    Priority  @default(MEDIUM)
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String    
+  user   User   @relation(fields: [userId], references: [id])
 
   @@map("tasks")
 }

@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { authOptions } from "../../auth/[...nextauth]/route";
+import { getServerSession } from "next-auth";
+import { Session } from "next-auth";
 
 export async function GET(
   request: NextRequest,
   ctx: { params: Promise<{ id: string }> }
 ) {
+  const session = await getServerSession(authOptions);
+  if (!(session as any)?.user?.id) {
+    return NextResponse.json(
+      { error: "Unauthorized" }, 
+      { status: 401 }
+    );
+  }
   try {
     const { id } = await ctx.params;
     const task = await prisma.task.findUnique({
@@ -26,6 +36,13 @@ export async function PATCH(
     request: NextRequest,
     ctx: { params: Promise<{ id: string }>}
 ) {
+    const session = await getServerSession(authOptions);
+    if (!(session as any)?.user?.id) {
+        return NextResponse.json(
+          { error: "Unauthorized" }, 
+          { status: 401 }
+        );
+      }
     try{
         const { id } = await ctx.params;
         const body = await request.json()
@@ -46,6 +63,13 @@ export async function DELETE(
     request: NextRequest, 
     ctx: { params: Promise<{ id: string }> }
 ) {
+    const session = await getServerSession(authOptions);
+    if (!(session as any)?.user?.id) {
+        return NextResponse.json(
+          { error: "Unauthorized" }, 
+          { status: 401 }
+        );
+      }
     try{const { id } = await ctx.params;
         await prisma.task.delete({
             where: { id },
