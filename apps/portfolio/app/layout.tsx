@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "next-themes";
+import Navbar from "@/components/navbar";
 
 const raleway = Raleway({ subsets: ["latin"]})
 
@@ -15,11 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={raleway.className}
       >
-        {children}
+        <ThemeProvider attribute="class" enableSystem defaultTheme="system">
+          <Navbar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

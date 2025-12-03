@@ -5,18 +5,73 @@ import { Task } from "@prisma/client";
 import TaskCard from "./components/TaskCard";
 import TaskForm from "./components/TaskForm";
 import { useSession, signOut } from "next-auth/react";
+import useRequireAuth from "./hooks/useRequireAuth";
+import { Category } from "@prisma/client";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import Link from 'next/link';
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Task["status"] | "ALL">("ALL");
   const [sortBy, setSortBy] = useState("");
-
-  const { data: session } = useSession();
+  const [selectedCategory, setSelectedCategory] = useState<Category[]>(["WORK", "PERSONAL", "LEARNING", "HOME", "HEALTH", "FINANCE", "TRAVEL", "ENTERTAINMENT", "SOCIAL", "OTHER"]);
+  const { session, showExpiredMessage } = useRequireAuth();
 
   const userId = (session?.user as any)?.id;
 
   console.log("session:", session)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = tasksToSort.findIndex((task) => task.id === active.id);
+      const newIndex = tasksToSort.findIndex((task) => task.id === over.id);
+
+      const newTasks = arrayMove(tasksToSort, oldIndex, newIndex);
+
+      setTasks(newTasks);
+
+      try {
+        const taskIds = newTasks.map((task) => task.id);
+        const response = await fetch("/api/tasks/reorder", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ taskIds }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to reorder tasks");
+        }
+      } catch (error) {
+        console.error("Failed to reorder tasks:", error);
+        fetchTasks();
+      }
+    }
+  };
 
   useEffect(() => {
     fetchTasks();
@@ -47,6 +102,7 @@ export default function Home() {
   const createTask = async ( taskData: {
     title: string;
     description: string;
+    category: string | null;
     priority: Task["priority"];
     dueDate: string | null;
   }) => {
@@ -108,30 +164,48 @@ export default function Home() {
     })
   }
 
+  if (sortBy === "category"){
+    tasksToSort = tasksToSort.filter((task) => selectedCategory.includes(task.category));
+  }
+
+  if (showExpiredMessage){
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-gray-600 mb-2">
+            Your session has expired. Redirecting to login...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {session ? (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-8 flex">
-        <div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Task Manager
-          </h1>
-          <p className="text-gray-600">
-            Manage your tasks efficiently with status tracking
-          </p>
+      <div className="container mx-auto px-4 py-8 max-w-full">
+        <div className="flex flex-row gap-4 ml-auto justify-end mb-4">
+          <Link href="/stats" className="bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition">Stats</Link>
+          <button onClick={() => signOut( {callbackUrl: "/auth/login" })} className="bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition">Logout</button>
         </div>
-        <button onClick={() => signOut()} className="bg-indigo-600 text-white py-2 px-4 ml-auto rounded hover:bg-indigo-700 transition">Logout</button>
-      </header>
+        <header className="mb-8 w-full">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Task Manager
+            </h1>
+            <p className="text-gray-600">
+              Manage your tasks efficiently with status tracking
+            </p>
+          </div>
+        </header>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-1 min-w-0">
+            <TaskForm onSubmit={createTask} />
+          </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-          <TaskForm onSubmit={createTask} />
-        </div>
-
-        <div className="md:col-span-2 justify-between">
-            <div className="mb-4 flex gap-2">
+        <div className="md:col-span-2 justify-between min-w-0">
+            <div className="flex flex-col mb-4 md:flex-row flex-wrap gap-2 w-full max-w-full min-w-0">
               {(["ALL", "TODO", "IN_PROGRESS", "DONE"] as const).map(
                 (status) => (
                   <button
@@ -147,7 +221,7 @@ export default function Home() {
                   </button>
                 )
               )}
-              <div className="self-center ml-auto">
+              <div className="self-center ml-auto ">
                 <select 
                   className="text-black"
                   value={sortBy}
@@ -156,8 +230,30 @@ export default function Home() {
                   <option value="">Filter By</option>
                   <option value="priority">Priority</option>
                   <option value="dueDate">Due Date</option>
+                  <option value="category">Category</option>
                 </select>
               </div>
+              {sortBy === "category" ? 
+                <div className="flex flex-col gap-4 items-center text-black md:flex-row">
+                {["WORK", "PERSONAL", "LEARNING", "HOME", "HEALTH", "FINANCE", "TRAVEL", "ENTERTAINMENT", "SOCIAL", "OTHER"].map((cat) => (
+                  <label key={cat} className="flex items-center gap-1 text-sm">
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={selectedCategory.includes(cat as Category)}
+                      onChange={(e) => {
+                        if (e.target.checked){
+                          setSelectedCategory([...selectedCategory, cat as Category]);
+                        } else {
+                          setSelectedCategory(selectedCategory.filter((c) => c !== cat as Category));
+                        }
+                      }}
+                    />
+                    {cat}
+                  </label>
+                ))}
+              </div>
+                : null}
             </div> 
 
           {loading ? (
@@ -166,7 +262,16 @@ export default function Home() {
             <p className="text-center py-8 text-gray-500">
               No tasks found. Create one to get started!
             </p>
-          ) : (
+          ) : ( 
+          <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={tasksToSort.map((task) => task.id)}
+            strategy={verticalListSortingStrategy}
+          >
             <div className="space-y-4">
               {tasksToSort.map((task) => (
                 <TaskCard
@@ -177,14 +282,15 @@ export default function Home() {
                 />
               ))}
             </div>
-          )}
-        </div>
-      </div>
-    </div>) : (
+          </SortableContext>
+        </DndContext>
+        )}
+    </div>
+  </div>
+</div>) : (
       <div className="container mx-auto px-4 py-8">
         <p className="text-center py-8 text-gray-500">
-          Please login to manage your tasks <a href="/api/auth/signin" className="text-indigo-600 hover:text-indigo-800">Login</a>
-          <a href="/auth/register" className="text-indigo-600 hover:text-indigo-800">Register</a>
+          Please <a href="/auth/login" className="text-indigo-600 hover:text-indigo-800">Login</a> or <a href="/auth/register" className="text-indigo-600 hover:text-indigo-800">Register</a> to manage your tasks 
         </p>
       </div>
     )}

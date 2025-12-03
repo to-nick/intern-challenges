@@ -16,7 +16,10 @@ export async function GET(request: NextRequest){
     try{
         const tasks = await prisma.task.findMany({
             where: { userId: (session as any).user.id },
-            orderBy: {createdAt: "desc"}
+            orderBy: [
+                {order: "asc"},
+                {createdAt: "desc"}
+            ]
         });
         return NextResponse.json(tasks);
     } catch (error){
@@ -38,14 +41,25 @@ export async function POST(request: NextRequest){
     try{
         const body = await request.json();
         
+
+        const maxOrder = await prisma.task.findFirst({
+            where: { userId: (session as any).user.id },
+            orderBy: { order: "desc" },
+            select: { order: true }
+        });
+
+        const newOrder = maxOrder ? maxOrder.order + 1 : 0;
+
         const task = await prisma.task.create({
             data: {
                 title: body.title,
                 description: body.description,
                 status: body.status || "TODO",
+                category: body.category,
                 priority: body.priority || "MEDIUM",
                 dueDate: body.dueDate ? new Date(body.dueDate) : null,
                 userId: (session as any).user.id,
+                order: newOrder,
             }
         });
         console.log("Task to return", task);

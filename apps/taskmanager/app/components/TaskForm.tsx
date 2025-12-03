@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { Priority } from "@prisma/client";
+import { Category } from "@prisma/client";
 
 interface TaskFormProps {
     onSubmit: (task: {
       title: string;
       description: string;
+      category: string | null;
       priority: Priority;
       dueDate: string | null;
     }) => void;
@@ -17,12 +19,13 @@ interface TaskFormProps {
     const [description, setDescription] = useState("");
     const [priority, setPriority] = useState<Priority>("MEDIUM");
     const [dueDate, setDueDate] = useState<string | null>('');
+    const [category, setCategory] = useState<Category>("OTHER");
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim()) return;
 
-        onSubmit({ title, description, priority, dueDate });
+        onSubmit({ title, description, category, priority, dueDate });
         setTitle("");
         setDescription("");
         setPriority("MEDIUM");
@@ -32,7 +35,7 @@ interface TaskFormProps {
     return (
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-lg shadow p-6 mb-6"
+          className="bg-white rounded-lg shadow p-6 mb-6 w-full max-w-full min-w-0"
         >
           <h2 className="text-xl font-bold text-black mb-4">Add New Task</h2>
           <div className="space-y-4">
@@ -78,6 +81,26 @@ interface TaskFormProps {
                 <option value="MEDIUM">Medium</option>
                 <option value="HIGH">High</option>
               </select>
+            </div>
+            <div>
+              <label htmlFor="category" className="block text-sm text-black font-medium mb-1">Category</label>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as Category)}
+                className="w-full border border-gray-300 text-gray-500 rounded px-3 py-2"
+              >
+              <option value="WORK">Work</option>
+              <option value="PERSONAL">Personal</option>
+              <option value="LEARNING">Learning</option>
+              <option value="HOME">Home</option>
+              <option value="HEALTH">Health</option>
+              <option value="FINANCE">Finance</option>
+              <option value="TRAVEL">Travel</option>
+              <option value="ENTERTAINMENT">Entertainment</option>
+              <option value="SOCIAL">Social</option>
+              <option value="OTHER">Other</option>
+            </select>
             </div>
             <div>
               <label htmlFor="dueDate" 

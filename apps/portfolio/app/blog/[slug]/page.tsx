@@ -1,6 +1,8 @@
 import { client } from "@/lib/sanity";
 import { PortableText, PortableTextBlock } from "@portabletext/react";
 import { notFound } from "next/navigation";
+import { urlFor } from "@/sanity/lib/image";
+import Image from "next/image";
 
 interface Post {
   _id: string;
@@ -9,6 +11,9 @@ interface Post {
   body: PortableTextBlock[];
   publishedAt: string;
   author?: string;
+  image?: {
+    alt?: string;
+  };
 }
 
 async function getPost(slug: string): Promise<Post | null> {
@@ -19,7 +24,8 @@ async function getPost(slug: string): Promise<Post | null> {
       slug,
       body,
       publishedAt,
-      author
+      author,
+      image,
     }`,
     { slug }
   );
@@ -42,6 +48,11 @@ export default async function BlogPost({
       <article className="container mx-auto px-4 py-16">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-5xl font-bold mb-4">{post.title}</h1>
+          {post.image && (
+            <div className="mb-8">
+              <Image src={urlFor(post.image).url()} alt={post.image.alt || post.title} width={1000} height={1000} />
+            </div>
+          )}
           <div className="flex gap-4 text-gray-600 mb-8 pb-8 border-b">
             <span>{post.author || "Anonymous"}</span>
             <span>•</span>

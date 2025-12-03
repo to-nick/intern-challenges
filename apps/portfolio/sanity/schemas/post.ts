@@ -33,10 +33,34 @@ export default defineType({
       initialValue: () => new Date().toISOString(),
     }),
     defineField({
+      name: "categories",
+      title: "Categories",
+      type: "array",
+      of: [{ type: "string" }],
+      options: {
+        layout: "tags",
+      },
+    }),
+    defineField({
       name: "excerpt",
       title: "Excerpt",
       type: "text",
       rows: 3,
+    }),
+    defineField({
+      name: "image",
+      title: "Image",
+      type: "image",
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt",
+          type: "string",
+        }),
+      ],
     }),
     defineField({
       name: "body",

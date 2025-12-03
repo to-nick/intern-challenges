@@ -35,11 +35,22 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     session: {
-      strategy: "jwt" as const
+      strategy: "jwt" as const,
+      maxAge: 60 * 60
     },
     secret: process.env.NEXTAUTH_SECRET,
     debug: process.env.NODE_ENV === "development",
     callbacks: {
+      async jwt({ token, user }) {
+        if (user) {
+          token.sub = user.id;
+        }
+        const now = Math.floor(Date.now() / 1000);
+        token.exp = now + 60 * 60;
+
+        return token;
+      },
+
       async session({session, token}) {
         return {
           ...session,
