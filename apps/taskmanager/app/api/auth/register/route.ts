@@ -27,7 +27,11 @@ export async function POST(request: NextRequest){
         });
 
 
-        const { passwordHash: _, ...userWithoutPassword } = user;
+        const userWithoutPassword = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        };
 
         return NextResponse.json(userWithoutPassword, { status: 201 });
     } catch (error){

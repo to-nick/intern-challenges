@@ -31,7 +31,6 @@ interface TaskCardProps {
       transform,
       transition,
       isDragging,
-      isSorting,
     } = useSortable({ id: task.id });
 
     const style = {

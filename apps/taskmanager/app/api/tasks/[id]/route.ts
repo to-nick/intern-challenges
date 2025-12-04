@@ -2,14 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
-import { Session } from "next-auth";
 
+interface SessionWithId {
+  user: {
+    id: string;
+  };
+}
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   ctx: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
-  if (!(session as any)?.user?.id) {
+  if (!(session as SessionWithId)?.user?.id) {
     return NextResponse.json(
       { error: "Unauthorized" }, 
       { status: 401 }
@@ -24,7 +28,7 @@ export async function GET(
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
     return NextResponse.json(task);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch task" },
       { status: 500 }
@@ -33,11 +37,11 @@ export async function GET(
 }
 
 export async function PATCH(
-    request: NextRequest,
+    _request: NextRequest,
     ctx: { params: Promise<{ id: string }>}
 ) {
     const session = await getServerSession(authOptions);
-    if (!(session as any)?.user?.id) {
+    if (!(session as SessionWithId)?.user?.id) {
         return NextResponse.json(
           { error: "Unauthorized" }, 
           { status: 401 }
@@ -45,7 +49,7 @@ export async function PATCH(
       }
     try{
         const { id } = await ctx.params;
-        const body = await request.json()
+        const body = await _request.json()
         const task = await prisma.task.update({
             where: { id },
             data: body,
@@ -60,11 +64,11 @@ export async function PATCH(
 }
 
 export async function DELETE( 
-    request: NextRequest, 
+    _request: NextRequest, 
     ctx: { params: Promise<{ id: string }> }
 ) {
     const session = await getServerSession(authOptions);
-    if (!(session as any)?.user?.id) {
+    if (!(session as SessionWithId)?.user?.id) {
         return NextResponse.json(
           { error: "Unauthorized" }, 
           { status: 401 }

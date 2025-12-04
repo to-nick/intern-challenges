@@ -3,9 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
+interface SessionWithId {
+    user: {
+        id: string;
+    };
+}
+
 export async function PATCH(request: NextRequest){
     const session = await getServerSession(authOptions);
-    if(!(session as any)?.user?.id){
+    if(!(session as SessionWithId)?.user?.id){
         return NextResponse.json(
             {error: "Unauthorized"}, 
             {status: 401});
@@ -17,7 +23,7 @@ export async function PATCH(request: NextRequest){
             return prisma.task.updateMany({
                 where: {
                     id: taskId,
-                    userId: (session as any).user.id,
+                    userId: (session as SessionWithId).user.id,
                 },
                 data: {
                     order: index,

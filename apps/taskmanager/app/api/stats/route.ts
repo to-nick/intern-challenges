@@ -3,14 +3,20 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 
-export async function GET(request: NextRequest){
+interface SessionWithId {
+    user: {
+        id: string;
+    };
+}
+
+export async function GET(_request: NextRequest){
     const session = await getServerSession(authOptions);
-    if (!(session as any)?.user?.id) {
+    if (!(session as SessionWithId)?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+      }
     try{
         const allTasks = await prisma.task.findMany({
-            where: { userId: (session as any).user.id },
+            where: { userId: (session as SessionWithId).user.id },
             select: {status: true, category: true},
         });
 

@@ -7,7 +7,6 @@ interface StatusDistribution {
     name: string;
     value: number;
     status: string;
-    [key: string]: any;
 }
 
 interface StatResponse {

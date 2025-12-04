@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Task } from "@prisma/client";
 import TaskCard from "./components/TaskCard";
 import TaskForm from "./components/TaskForm";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import useRequireAuth from "./hooks/useRequireAuth";
 import { Category } from "@prisma/client";
 import {
@@ -32,7 +32,7 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<Category[]>(["WORK", "PERSONAL", "LEARNING", "HOME", "HEALTH", "FINANCE", "TRAVEL", "ENTERTAINMENT", "SOCIAL", "OTHER"]);
   const { session, showExpiredMessage } = useRequireAuth();
 
-  const userId = (session?.user as any)?.id;
+  const userId = (session?.user as { id?: string })?.id;
 
   console.log("session:", session)
 
@@ -42,6 +42,32 @@ export default function Home() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const fetchTasks = useCallback(async () => {
+    try{
+      const response = await fetch(`api/tasks?userId=${userId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      if (data.error) {
+        console.error("API Error:", data.error);
+        setTasks([]);
+        return;
+      }
+      setTasks(data);
+    } catch (error){
+      console.error("Failed to fetch tasks:", error);
+      setTasks([]);
+    } finally {
+      setLoading(false)
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -70,32 +96,6 @@ export default function Home() {
         console.error("Failed to reorder tasks:", error);
         fetchTasks();
       }
-    }
-  };
-
-  useEffect(() => {
-    fetchTasks();
-  }, [userId]);
-
-  const fetchTasks = async () => {
-    try{
-      const response = await fetch(`api/tasks?userId=${userId}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-
-      if (data.error) {
-        console.error("API Error:", data.error);
-        setTasks([]);
-        return;
-      }
-      setTasks(data);
-    } catch (error){
-      console.error("Failed to fetch tasks:", error);
-      setTasks([]);
-    } finally {
-      setLoading(false)
     }
   };
 

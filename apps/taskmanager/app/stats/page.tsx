@@ -10,7 +10,7 @@ import useRequireAuth from "../hooks/useRequireAuth";
 
 export default function Stats(){
 
-    const { session, showExpiredMessage } = useRequireAuth();
+    const { showExpiredMessage } = useRequireAuth();
 
     if (showExpiredMessage) {
         return (

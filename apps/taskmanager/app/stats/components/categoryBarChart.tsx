@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { useSession } from "next-auth/react";
 
 interface CategoryDistribution {
     name: string;
     value: number;
     category: string;
-    [key: string]: any;
 }
 
 const CATEGORY_COLORS = {
