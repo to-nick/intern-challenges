@@ -44,16 +44,16 @@ export default async function BlogPost({
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-gradient-to-br dark:from-black from-white transition-all duration-300 py-20">
       <article className="container mx-auto px-4 py-16">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-5xl font-bold mb-4">{post.title}</h1>
+          <h1 className="text-5xl font-bold mb-4 dark:text-gray-200">{post.title}</h1>
           {post.image && (
             <div className="mb-8">
               <Image src={urlFor(post.image).url()} alt={post.image.alt || post.title} width={1000} height={1000} />
             </div>
           )}
-          <div className="flex gap-4 text-gray-600 mb-8 pb-8 border-b">
+          <div className="flex gap-4 text-gray-600 dark:text-gray-300 mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
             <span>{post.author || "Anonymous"}</span>
             <span>•</span>
             <time>
@@ -64,7 +64,7 @@ export default async function BlogPost({
               })}
             </time>
           </div>
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-lg max-w-none dark:prose-invert">
             <PortableText value={post.body} />
           </div>
         </div>
