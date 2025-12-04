@@ -139,7 +139,7 @@ return(
                         The Good Weekend Quiz Leaderboard is a React-based app which uses Node.Js with Express and Nest.js in the backend to access a MySQL database, containing user scores and data.</p>
                     <div className="flex flex-wrap gap-4 justify-center">
                         {GWQIconList.map((icon)=> 
-                        <div className="flex items-center gap-4 dark:bg-white dark:text-black rounded-md p-2">
+                        <div key={icon.name} className="flex items-center gap-4 dark:bg-white dark:text-black rounded-md p-2">
                             <p className="text-sm md:text-base">{icon.name}</p>
                             <img src={icon.imageLink}
                                 alt={icon.alt}
@@ -158,7 +158,7 @@ return(
                         Players are tasked with correctly guessing a list of 10 items based on the provided question.</p>
                     <div className="flex flex-wrap gap-4 justify-center">
                         {TopTenIconList.map((icon)=> 
-                        <div className="flex items-center gap-4 dark:bg-white dark:text-black rounded-md p-2">
+                        <div key={icon.name} className="flex items-center gap-4 dark:bg-white dark:text-black rounded-md p-2">
                             <p className="text-sm md:text-base">{icon.name}</p>
                             <img src={icon.imageLink}
                                 alt={icon.alt}
@@ -174,10 +174,10 @@ return(
                 </div>
                 <article className="w-full lg:w-2/3 flex flex-col gap-4 items-center justify-center">
                     <p>With a previous career in Film and Television, I had the opportunity to build a website for a former employer who works as a Key Grip. 
-                        Built with HTML, CSS and some very minor Javascript, the page is used to promote the business's services to production companies and cinematographers around the world.</p>
+                        Built with HTML, CSS and some very minor Javascript, the page is used to promote the business&apos;s services to production companies and cinematographers around the world.</p>
                     <div className="flex flex-wrap gap-4 justify-center">
                         {RTGripsIconList.map((icon)=> 
-                        <div className="flex items-center gap-4 dark:bg-white dark:text-black rounded-md p-2">
+                        <div key={icon.name} className="flex items-center gap-4 dark:bg-white dark:text-black rounded-md p-2">
                             <p className="text-sm md:text-base">{icon.name}</p>
                             <img src={icon.imageLink}
                                 alt={icon.alt}
