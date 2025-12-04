@@ -89,13 +89,13 @@ export default function About() {
   
 
     return (
-      <main className="min-h-screen flex bg-gradient-to-br dark:from-black dark:via-gray-700 dark:to-gray-500 from-white via-gray-200 to-gray-500 transition-all duration-300 ">
-        <div className="flex flex-col ml-10 mr-10">
+      <main className="min-h-screen flex bg-gradient-to-br dark:from-black from-white transition-all duration-300 py-10">
+        <div className="flex flex-col ml-3 mr-3 md:ml-10 md:mr-10">
         <div className="ml-auto p-4">
         </div>
          
         <div className="container mx-auto px-4 py-16 flex flex-col items-center">
-          <div className="prose prose-lg ">
+          <div className="prose prose-lg gap-4 flex flex-col">
             <h1 className='dark:text-gray-200 text-[clamp(2rem,4vw,3rem)]'>About Me</h1>
             <p className="dark:text-gray-200 text-[clamp(0.75rem,3vw,1.25rem)]">
                 From Higher Education, to management, to film and television, I have worn many hats in my professional career but during a career transition I found my passion for full-stack development and have worked tirelessly to build a skill set that can be a valuable asset to businesses and online ventures.
@@ -105,14 +105,14 @@ export default function About() {
           </div>
         </div>
         <h2 className='self-center dark:text-gray-200 text-[clamp(1.5rem,3vw,2rem)]'>The Stack</h2>
-        <div className="flex gap-2 justify-center flex-wrap bg-blue-50 dark:bg-gray-200 m-4 border rounded-xl border-black">
+        <div className="flex gap-2 justify-center flex-wrap bg-white dark:bg-black m-4 border rounded-xl border-black py-4">
           {iconList.map((icon) => 
-          <div className="flex p-2 flex-col justify-center items-center gap-3"
+          <div className="h-30 w-20 md:h-35 md:w-25 flex flex-col justify-center items-center text-sm md:text-base"
                                         key={icon.name}>
-            <div className="h-25 w-20 p-2 flex justfy-center items-center" >
-              <img src={icon.imageLink} />
+            <div className="h-20 w-15 md:h-25 md:w-20 flex justify-center items-center dark:bg-white dark:text-white rounded-md" >
+              <img className="h-10 w-10 md:h-15 md:w-15" src={icon.imageLink} />
             </div> 
-            <p className="dark:bg-gray-500 dark:text-white p-2 rounded-md">{icon.name}</p>
+            <p className="dark:white dark:text-white rounded-md text-center">{icon.name}</p>
           </div> )}
           
         </div>

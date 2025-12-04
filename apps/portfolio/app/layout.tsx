@@ -3,6 +3,7 @@ import { Raleway } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 const raleway = Raleway({ subsets: ["latin"]})
 
@@ -24,6 +25,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" enableSystem defaultTheme="system">
           <Navbar />
           {children}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

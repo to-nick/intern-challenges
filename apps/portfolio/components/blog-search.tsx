@@ -19,11 +19,11 @@ export default function BlogSearch(){
 
   }
     return(
-      <div>
+      <div className="w-1/2">
         <input 
           type="text" 
           placeholder="Search" 
-          className="border border-gray-200 rounded-lg p-2 w-1/2 text-center" 
+          className="border border-gray-200 rounded-lg p-2 w-full text-center" 
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>

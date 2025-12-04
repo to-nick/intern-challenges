@@ -78,11 +78,11 @@ export default async function Blog({searchParams}: {searchParams: Promise<{query
   const posts: Post[] = await searchPosts(query, category);
   const categories: string[] = await getCategories();
   return (
-    <main className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-16">
+    <main className="min-h-screen bg-white dark:bg-black pt-15 flex flex-col items-center mx-5 md:mx-10px-4">
+      <div className="container py-16">
         <div className="flex items-center justify-between w-full mb-12">
           <h1 className="text-5xl font-bold text-center">Blog</h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-col-reverse md:flex-row">
             <CategoryFilter categories={categories} />
             <BlogSearch />
             
@@ -101,7 +101,7 @@ export default async function Blog({searchParams}: {searchParams: Promise<{query
                 </h2>
               </Link>
               {post.excerpt && (
-                <p className="text-gray-600 mb-4">{post.excerpt}</p>
+                <p className="text-gray-600 dark:text-gray-200 mb-4">{post.excerpt}</p>
               )}
               <div className="flex justify-between text-sm text-gray-500">
                 <span>{post.author || "Anonymous"}</span>

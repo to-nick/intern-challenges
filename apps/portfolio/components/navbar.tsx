@@ -13,8 +13,8 @@ export default function Navbar(){
     }
 
     return(
-        <nav className="flex flex-col items-center p-4 w-full">
-            <div className="flex justify-between items-center w-full">
+        <nav className="flex flex-col items-center p-4 w-full bg-transparent dark:bg-transparent absolute top-0 left-0">
+            <div className="flex justify-between items-center bg-transparent dark:bg-transparent w-full">
                 <div>
                     <img src={Logo.src} alt="Logo" className="h-15 w-10n p-2" />
                 </div>
@@ -61,7 +61,7 @@ export default function Navbar(){
             </div>
             
             {isOpen && (
-            <div className={`${isOpen ? "flex gap-4 absolute top-19 left-0 w-full opacity-90 dark:bg-black bg-white items-center justify-center" : "hidden"}`}>
+            <div className={`${isOpen ? "flex gap-4 absolute top-19 left-0 w-full bg-white dark:bg-black items-center justify-center" : "hidden"}`}>
                 <div className="flex flex-col gap-4 text-[clamp(0.75rem,3vw,2rem)] text-center">
                     <Link 
                         href="/"
