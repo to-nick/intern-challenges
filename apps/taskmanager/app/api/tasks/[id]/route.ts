@@ -9,6 +9,7 @@ interface SessionWithId {
   };
 }
 export async function GET(
+  _request: NextRequest,
   ctx: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
